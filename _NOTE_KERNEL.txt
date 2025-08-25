@@ -1,0 +1,4 @@
+
+// NOTE: After copying, open app/Http/Kernel.php and add middleware aliases:
+// 'admin' => \App\Http\Middleware\AdminMiddleware::class,
+// EnsureAccessWindow::class is used directly by class name in routes.
