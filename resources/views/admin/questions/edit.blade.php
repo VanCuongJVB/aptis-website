@@ -7,6 +7,15 @@
       <input name="order" type="number" class="border rounded p-2" value="{{ $question->order }}">
     </div>
     <div>
+      <label class="block text-sm">Part</label>
+      @php $partCount = $question->quiz->partCount(); @endphp
+      <select name="part" class="border rounded p-2">
+        @for($i=1;$i<=$partCount;$i++)
+          <option value="{{ $i }}" @selected($question->part==$i)>Part {{ $i }}</option>
+        @endfor
+      </select>
+    </div>
+    <div>
       <label class="block text-sm">Loại</label>
       <select name="type" class="border rounded p-2">
         <option value="single" @selected($question->type==='single')>Trắc nghiệm 1 đáp án</option>
@@ -24,7 +33,7 @@
       <textarea name="stem" class="border rounded w-full p-2" required>{{ $question->stem }}</textarea>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-2">
+    <div id="options-container" class="grid md:grid-cols-2 gap-2">
       @foreach($question->options as $i => $opt)
         <div class="border rounded p-2">
           <div class="text-sm text-gray-600 mb-1">Phương án {{ $i+1 }}</div>
@@ -35,6 +44,21 @@
       @endforeach
     </div>
 
-    <button class="bg-blue-600 text-white px-4 py-2 rounded">Lưu</button>
+    <div class="flex gap-2">
+      <button type="button" id="add-option" class="px-3 py-1 border rounded">Thêm phương án</button>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded">Lưu</button>
+    </div>
   </form>
+  <script>
+    document.getElementById('add-option').addEventListener('click', function () {
+      const container = document.getElementById('options-container');
+      const index = container.children.length;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'border rounded p-2';
+      wrapper.innerHTML = `<div class="text-sm text-gray-600 mb-1">Phương án ${index + 1}</div>` +
+        `<input name="options[${index}][label]" class="border rounded w-full p-2">` +
+        `<label class="flex items-center gap-2 mt-1 text-sm"><input type="checkbox" name="options[${index}][is_correct]"> Đáp án đúng</label>`;
+      container.appendChild(wrapper);
+    });
+  </script>
 </x-layouts.base>

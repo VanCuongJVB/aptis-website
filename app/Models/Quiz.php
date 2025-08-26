@@ -20,6 +20,18 @@ class Quiz extends Model
     ];
 
     public function questions() {
-        return $this->hasMany(Question::class)->orderBy('order');
+        return $this->hasMany(Question::class)->orderBy('part')->orderBy('order');
+    }
+
+    /**
+     * Number of parts for this quiz depending on skill.
+     */
+    public function partCount(): int
+    {
+        return match ($this->skill) {
+            'reading'   => 5,
+            'listening' => 4,
+            default     => 1,
+        };
     }
 }
