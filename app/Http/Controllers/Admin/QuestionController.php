@@ -17,11 +17,12 @@ class QuestionController extends Controller
 
     public function store(Request $request, Quiz $quiz)
     {
+        $maxPart = $quiz->partCount();
         $data = $request->validate([
             'stem'  => 'required|string',
             'type'  => 'required|in:single,multi',
             'order' => 'required|integer|min:1',
-            'part'  => 'required|integer|min:1|max:4',
+            'part'  => "required|integer|min:1|max:$maxPart",
             'audio' => 'nullable|file|mimes:mp3,wav,m4a,ogg|max:10240',
             'options' => 'required|array|min:2',
             'options.*.label' => 'required|string',
@@ -62,11 +63,12 @@ class QuestionController extends Controller
 
     public function update(Request $request, Question $question)
     {
+        $maxPart = $question->quiz->partCount();
         $data = $request->validate([
             'stem'  => 'required|string',
             'type'  => 'required|in:single,multi',
             'order' => 'required|integer|min:1',
-            'part'  => 'required|integer|min:1|max:4',
+            'part'  => "required|integer|min:1|max:$maxPart",
             'audio' => 'nullable|file|mimes:mp3,wav,m4a,ogg|max:10240',
             'options' => 'required|array|min:2',
             'options.*.id' => 'nullable|integer',

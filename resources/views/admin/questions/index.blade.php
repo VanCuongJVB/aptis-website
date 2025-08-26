@@ -1,4 +1,5 @@
 <x-layouts.base>
+  @php $partCount = $quiz->partCount(); @endphp
   <h1 class="text-xl font-semibold mb-4">Câu hỏi — {{ $quiz->title }}</h1>
 
   <div class="bg-white rounded shadow p-4 mb-6">
@@ -11,7 +12,7 @@
       <div>
         <label class="block text-sm">Part</label>
         <select name="part" class="border rounded p-2">
-          @for($i=1;$i<=4;$i++)
+          @for($i=1;$i<=$partCount;$i++)
             <option value="{{ $i }}">Part {{ $i }}</option>
           @endfor
         </select>
@@ -33,24 +34,24 @@
         <label class="block text-sm">Nội dung câu hỏi</label>
         <textarea name="stem" class="border rounded w-full p-2" required></textarea>
       </div>
-      <div class="grid md:grid-cols-2 gap-2">
+      <div id="options-container" class="grid md:grid-cols-2 gap-2">
+        @for($i=0;$i<4;$i++)
         <div class="border rounded p-2">
-          <div class="text-sm text-gray-600 mb-1">Phương án 1</div>
-          <input name="options[0][label]" class="border rounded w-full p-2">
-          <label class="flex items-center gap-2 mt-1 text-sm"><input type="checkbox" name="options[0][is_correct]"> Đáp án đúng</label>
+          <div class="text-sm text-gray-600 mb-1">Phương án {{ $i+1 }}</div>
+          <input name="options[{{ $i }}][label]" class="border rounded w-full p-2">
+          <label class="flex items-center gap-2 mt-1 text-sm"><input type="checkbox" name="options[{{ $i }}][is_correct]"> Đáp án đúng</label>
         </div>
-        <div class="border rounded p-2">
-          <div class="text-sm text-gray-600 mb-1">Phương án 2</div>
-          <input name="options[1][label]" class="border rounded w-full p-2">
-          <label class="flex items-center gap-2 mt-1 text-sm"><input type="checkbox" name="options[1][is_correct]"> Đáp án đúng</label>
-        </div>
+        @endfor
       </div>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded">Thêm câu hỏi</button>
+      <div class="flex gap-2">
+        <button type="button" id="add-option" class="px-3 py-1 border rounded">Thêm phương án</button>
+        <button class="bg-blue-600 text-white px-4 py-2 rounded">Thêm câu hỏi</button>
+      </div>
     </form>
   </div>
 
   @php $grouped = $quiz->questions->groupBy('part'); @endphp
-  @for($p=1;$p<=4;$p++)
+  @for($p=1;$p<=$partCount;$p++)
     <h2 class="text-lg font-semibold mt-8 mb-2">Part {{ $p }}</h2>
     <div class="bg-white rounded shadow divide-y">
       @foreach($grouped->get($p, collect()) as $q)
@@ -84,4 +85,16 @@
       @endif
     </div>
   @endfor
+  <script>
+    document.getElementById('add-option').addEventListener('click', function () {
+      const container = document.getElementById('options-container');
+      const index = container.children.length;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'border rounded p-2';
+      wrapper.innerHTML = `<div class="text-sm text-gray-600 mb-1">Phương án ${index + 1}</div>` +
+        `<input name="options[${index}][label]" class="border rounded w-full p-2">` +
+        `<label class="flex items-center gap-2 mt-1 text-sm"><input type="checkbox" name="options[${index}][is_correct]"> Đáp án đúng</label>`;
+      container.appendChild(wrapper);
+    });
+  </script>
 </x-layouts.base>
