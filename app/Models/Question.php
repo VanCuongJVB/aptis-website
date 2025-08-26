@@ -10,7 +10,7 @@ class Question extends Model
     use HasFactory;
 
     protected $fillable = [
-        'quiz_id','stem','type','order','audio_path'
+        'quiz_id','stem','type','order','part','audio_path'
     ];
 
     public function quiz() {

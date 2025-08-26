@@ -9,6 +9,14 @@
         <input name="order" type="number" class="border rounded p-2" value="{{ ($quiz->questions->max('order') ?? 0)+1 }}">
       </div>
       <div>
+        <label class="block text-sm">Part</label>
+        <select name="part" class="border rounded p-2">
+          @for($i=1;$i<=4;$i++)
+            <option value="{{ $i }}">Part {{ $i }}</option>
+          @endfor
+        </select>
+      </div>
+      <div>
         <label class="block text-sm">Loại</label>
         <select name="type" class="border rounded p-2">
           <option value="single">Trắc nghiệm 1 đáp án</option>
@@ -41,32 +49,39 @@
     </form>
   </div>
 
-  <div class="bg-white rounded shadow divide-y">
-    @foreach($quiz->questions as $q)
-      <div class="p-4">
-        <div class="flex justify-between">
-          <div>
-            <div class="text-sm text-gray-500">#{{ $q->order }} • {{ $q->type }}</div>
-            <div class="font-medium">{{ Str::limit($q->stem, 120) }}</div>
-            @if($q->audio_path)
-              <audio class="mt-2" controls src="{{ Storage::url($q->audio_path) }}"></audio>
-            @endif
+  @php $grouped = $quiz->questions->groupBy('part'); @endphp
+  @for($p=1;$p<=4;$p++)
+    <h2 class="text-lg font-semibold mt-8 mb-2">Part {{ $p }}</h2>
+    <div class="bg-white rounded shadow divide-y">
+      @foreach($grouped->get($p, collect()) as $q)
+        <div class="p-4">
+          <div class="flex justify-between">
+            <div>
+              <div class="text-sm text-gray-500">#{{ $q->order }} • {{ $q->type }}</div>
+              <div class="font-medium">{{ Str::limit($q->stem, 120) }}</div>
+              @if($q->audio_path)
+                <audio class="mt-2" controls src="{{ Storage::url($q->audio_path) }}"></audio>
+              @endif
+            </div>
+            <div class="flex items-start gap-3">
+              <a href="{{ route('admin.questions.edit', $q) }}" class="text-sm">Sửa</a>
+              <form method="POST" action="{{ route('admin.questions.delete', $q) }}">
+                @csrf
+                <button class="text-sm text-red-600">Xóa</button>
+              </form>
+            </div>
           </div>
-          <div class="flex items-start gap-3">
-            <a href="{{ route('admin.questions.edit', $q) }}" class="text-sm">Sửa</a>
-            <form method="POST" action="{{ route('admin.questions.delete', $q) }}">
-              @csrf
-              <button class="text-sm text-red-600">Xóa</button>
-            </form>
-          </div>
-        </div>
 
-        <ul class="mt-2 list-disc ml-5">
-          @foreach($q->options as $opt)
-            <li class="{{ $opt->is_correct ? 'font-bold' : '' }}">{{ $opt->label }}</li>
-          @endforeach
-        </ul>
-      </div>
-    @endforeach
-  </div>
+          <ul class="mt-2 list-disc ml-5">
+            @foreach($q->options as $opt)
+              <li class="{{ $opt->is_correct ? 'font-bold' : '' }}">{{ $opt->label }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endforeach
+      @if($grouped->get($p, collect())->isEmpty())
+        <p class="p-4 text-sm text-gray-500">Chưa có câu hỏi.</p>
+      @endif
+    </div>
+  @endfor
 </x-layouts.base>

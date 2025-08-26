@@ -7,6 +7,14 @@
       <input name="order" type="number" class="border rounded p-2" value="{{ $question->order }}">
     </div>
     <div>
+      <label class="block text-sm">Part</label>
+      <select name="part" class="border rounded p-2">
+        @for($i=1;$i<=4;$i++)
+          <option value="{{ $i }}" @selected($question->part==$i)>Part {{ $i }}</option>
+        @endfor
+      </select>
+    </div>
+    <div>
       <label class="block text-sm">Loại</label>
       <select name="type" class="border rounded p-2">
         <option value="single" @selected($question->type==='single')>Trắc nghiệm 1 đáp án</option>
